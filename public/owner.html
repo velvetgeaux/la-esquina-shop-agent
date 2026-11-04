@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>La Esquina · Owner</title>
+<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:auto;padding:16px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left}button{margin:0 2px}</style></head><body>
+<h2>La Esquina — Owner portal</h2><p>PIN: <input id="pin" type="password" size="6"> <button onclick="load()">Open</button> <small>(demo PIN 2026)</small> · <a href="/">Chat</a></p>
+<h3>Orders</h3><table id="o"></table><h3>Loyalty</h3><table id="l"></table>
+<script>
+async function load(set){const r=await (await fetch('/api/owner',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pin:pin.value,set})})).json();
+if(r.error)return alert(r.error);
+o.innerHTML='<tr><th>#</th><th>Name</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr>'+r.orders.map(x=>`<tr><td>${x.id}</td><td>${esc(x.name)}</td><td>${x.items.map(i=>i.qty+'× '+esc(i.name)).join(', ')}</td><td>$${x.total.toFixed(2)}</td><td>${x.status}</td><td>${['preparing','ready','picked_up'].map(s=>`<button onclick="load({id:${x.id},status:'${s}'})">${s}</button>`).join('')}</td></tr>`).join('');
+l.innerHTML='<tr><th>Customer</th><th>Points</th></tr>'+r.loyalty.map(x=>`<tr><td>${esc(x.phone)}</td><td>${x.points}</td></tr>`).join('')}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
+</script></body></html>
